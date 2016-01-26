@@ -1,5 +1,6 @@
 package com.example.rent_a_center.shopper2;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -9,9 +10,21 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 
 public class CreateList extends AppCompatActivity {
+
     Intent intent;
+    EditText nameEditText;
+    EditText storeEditText;
+    EditText dateEditText;
+    Calendar calendar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,9 +32,54 @@ public class CreateList extends AppCompatActivity {
         setContentView(R.layout.activity_create_list);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        nameEditText = (EditText) findViewById(R.id.nameText);
+        storeEditText = (EditText) findViewById(R.id.storeText);
+        dateEditText = (EditText) findViewById(R.id.dataText);
+
+        calendar = Calendar.getInstance();
+
+        final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener(){
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                calendar.set(Calendar.YEAR, year);
+                calendar.set(Calendar.MONTH, monthOfYear);
+                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                updateDueDate();
+            }
+        };
+
+        dateEditText.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                new DatePickerDialog(
+                        CreateList.this,
+                        date,
+                        calendar.get(Calendar.YEAR),
+                        calendar.get(Calendar.MONTH),
+                        calendar.get(Calendar.DAY_OF_MONTH)
+                        ).show();
+
+
+            }
+        });
+    }
+
+    public void updateDueDate(){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-DD", Locale.getDefault());
+        dateEditText.setText(sdf.format(calendar.getTime()));
     }
 
     public void createList (MenuItem menuItem){
+        String name = nameEditText.getText().toString();
+        String store = storeEditText.getText().toString();
+        String date = dateEditText.getText().toString();
+
+        if (name.trim().equals("") || store.trim().equals("") || date.trim().equals("")){
+            Toast.makeText(this, "Please enter a name, store, and date!", Toast.LENGTH_LONG).show();
+        }  else
+            Toast.makeText(this, "Shopping list Created!", Toast.LENGTH_LONG).show();
+
 
 
     }
