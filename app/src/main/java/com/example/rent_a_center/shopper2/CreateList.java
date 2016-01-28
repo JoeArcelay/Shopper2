@@ -25,6 +25,7 @@ public class CreateList extends AppCompatActivity {
     EditText storeEditText;
     EditText dateEditText;
     Calendar calendar;
+    DBHandler dbHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +64,8 @@ public class CreateList extends AppCompatActivity {
 
             }
         });
+        dbHandler = new DBHandler(this, null);
+
     }
 
     public void updateDueDate(){
@@ -77,9 +80,10 @@ public class CreateList extends AppCompatActivity {
 
         if (name.trim().equals("") || store.trim().equals("") || date.trim().equals("")){
             Toast.makeText(this, "Please enter a name, store, and date!", Toast.LENGTH_LONG).show();
-        }  else
+        }  else {
+            dbHandler.addShoppingList(name, store, date);
             Toast.makeText(this, "Shopping list Created!", Toast.LENGTH_LONG).show();
-
+        }
 
 
     }
