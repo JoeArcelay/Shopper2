@@ -12,7 +12,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
 
     private static final int DATABASE_VERSION = 1;
-    private static final String DATABASE_NAME = "shopper.db";
+    private static final String DATABASE_NAME = "shopper2.db";
     public static final String TABLE_SHOPPING_LIST = "shoppinglist";
     public static final String COLUMN_LIST_ID = "_id";
     public static final String COLUMN_LIST_NAME = "list_name";
