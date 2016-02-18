@@ -1,16 +1,22 @@
 package com.example.rent_a_center.shopper2;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -23,9 +29,6 @@ public class ViewList extends AppCompatActivity {
     Intent intent;
     ShoppingListItems shoppingListItemsAdapter;
     ListView itemListView;
-
-
-
 
 
     @Override
@@ -54,7 +57,18 @@ public class ViewList extends AppCompatActivity {
         itemListView.setAdapter(shoppingListItemsAdapter);
 
         toolbar.setSubtitle("Total Cost: " + dbHandler.getShoppingListTotalCost((int) id));
-    }
+
+        itemListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                updateItem(id);
+                intent = new Intent(ViewList.this, ViewItem.class);
+                intent.putExtra("_id", id);
+                startActivity(intent);
+            }
+        });
+
+}
 
     public void openAddItem(View view){
 
@@ -65,6 +79,8 @@ public class ViewList extends AppCompatActivity {
     }
 
     public void deleteShoppingList(MenuItem menuItem){
+
+
 
     }
 
@@ -93,6 +109,36 @@ public class ViewList extends AppCompatActivity {
                 return true;
             default: return super.onOptionsItemSelected(item);
         }
+    }
+
+
+    private void updateItem(long id){
+
+        if(dbHandler.isItemPurchased((int) id) != 0){
+            dbHandler.updateItem((int) id);
+            Toast.makeText(this, "Item Purchased", Toast.LENGTH_LONG).show();
+        }
+
+        int count = dbHandler.getunpurchasedItems((int) this.id);
+
+        if(count == 0){
+
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+            builder.setSmallIcon(R.mipmap.ic_launcher);
+            builder.setContentTitle("Shopper");
+            builder.setContentText(shoppingListName + "completed!");
+
+            intent = new Intent(this, ViewList.class);
+
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            builder.setContentIntent(pendingIntent);
+
+            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+            notificationManager.notify(2142, builder.build());
+        }
+
     }
 
 }

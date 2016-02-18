@@ -12,7 +12,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DBHandler extends SQLiteOpenHelper {
 
 
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = "shopper2.db";
     public static final String TABLE_SHOPPING_LIST = "shoppinglist";
     public static final String COLUMN_LIST_ID = "_id";
@@ -99,7 +99,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
         SQLiteDatabase db = getWritableDatabase();
 
-        return db.rawQuery("SELECT * FROM " + TABLE_SHOPPING_LIST_ITEM + " WHERE " + COLUMN_ITEM_LIST_ID + " =" + listId, null);
+        return db.rawQuery("SELECT * FROM " + TABLE_SHOPPING_LIST_ITEM + " WHERE " + COLUMN_ITEM_LIST_ID + " = " + listId, null);
 
     }
 
@@ -160,5 +160,74 @@ public class DBHandler extends SQLiteOpenHelper {
 
     }
 
+    public int isItemPurchased(Integer itemId){
+        SQLiteDatabase db = getWritableDatabase();
 
+        String query = "SELECT * FROM " + TABLE_SHOPPING_LIST_ITEM +
+                " WHERE " + COLUMN_ITEM_HAS + " = \"false\" " + "AND " +
+                COLUMN_LIST_ID + " = " + itemId;
+
+        Cursor cursor = db.rawQuery(query, null);
+        return (cursor.getCount());
+    }
+
+    public void updateItem(Integer itemId){
+        SQLiteDatabase db = getWritableDatabase();
+
+
+        String query = "UPDATE " + TABLE_SHOPPING_LIST_ITEM + " SET " +
+                COLUMN_ITEM_HAS + " = \"TRUE\" " + " WHERE " +
+                COLUMN_ITEM_ID + " = " + itemId;
+
+        db.execSQL(query);
+
+        db.close();
+
+    }
+
+    public int getunpurchasedItems(Integer listId){
+        SQLiteDatabase db = getWritableDatabase();
+
+
+        String query = "SELECT * FROM " + TABLE_SHOPPING_LIST_ITEM +
+                " WHERE " + COLUMN_ITEM_HAS + " = \"false\" " + "AND " +
+                COLUMN_ITEM_LIST_ID + " = " + listId;
+
+        Cursor cursor = db.rawQuery(query, null);
+        return ( cursor.getCount());
+    }
+
+
+
+    public ShoppingListItem getShoppingListItems(Integer itemId) {
+
+        ShoppingListItem shoppingListItem = null;
+
+        SQLiteDatabase db = getWritableDatabase();
+
+
+        String query = "SELECT * FROM " + TABLE_SHOPPING_LIST_ITEM + " WHERE "  +
+                COLUMN_ITEM_ID + " = " + itemId;
+
+        Cursor cursor = db.rawQuery(query, null);
+
+        int numItems = cursor.getCount();
+
+        if(numItems >= 1){
+            cursor.moveToFirst();
+
+
+            shoppingListItem = new ShoppingListItem((cursor.getInt(cursor.getColumnIndex("_id"))),
+                    cursor.getString(cursor.getColumnIndex("item_name")),
+                    cursor.getDouble(cursor.getColumnIndex("item_price")),
+                    cursor.getInt(cursor.getColumnIndex("item_quantity")),
+                    cursor.getString(cursor.getColumnIndex("item_has")),
+                    cursor.getInt(cursor.getColumnIndex("item_list_id")));
+
+        }
+
+        db.close();
+        return shoppingListItem;
+
+    }
 }
